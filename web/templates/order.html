@@ -4,8 +4,10 @@
 <form action="" method="post">
   <label for="id_username">用户名：</label>
   <input id="user_name" name='username'>
-  <label for="id_order">要点的菜名：</label>
+  <label for="id_order">要点的午餐菜名：</label>
   <input id="order" name='order'>
+  <label for="id_order">要点的晚餐菜名：</label>
+  <input id="order2" name='order2'>
   {{ xsrf_form_html() }}
   <input type="submit" value="点餐">
 </form>

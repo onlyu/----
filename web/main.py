@@ -24,6 +24,7 @@ import hashlib
 import random
 
 from tornado.options import define, options
+from sets import Set
 
 define("port", default=8890, help="run on the given port", type=int)
 DOCUMENT_ROOT = os.path.dirname(__file__)
@@ -42,6 +43,7 @@ class Application(tornado.web.Application):
             (r"/auth/adduser", AddUserHandler),
             (r"/log/(?P<year>\d+)/(?P<month>\d+)/(?P<day>\d+)", LogHandler),
             (r"/order", OrderHandler),
+            (r"/showorder", ShowOrderHandler),
             (r"/supper", Cancel),
             ]
         settings = dict(
@@ -86,10 +88,36 @@ class OrderHandler(BaseHandler):
         order = self.get_argument("order")
         order2 = self.get_argument("order2")
         
-        self.write("username=%s order=%s order2=%s"%(name, order, order2))
         db = self.get_db()
         cursor = db.cursor()
+        cursor.execute('insert into torder (id,time,username,ordername1,ordername2) values (null, ?, ?, ?, ?)', 
+                       (datetime.datetime.now(),name,order, order2))
+        db.commit()
+        self.redirect("/showorder")
+        self.flush()
+
+        #self.write("恭喜你%s点餐成功,午餐%s,晚餐%s"%(name, order, order2))
         
+class ShowOrderHandler(BaseHandler):
+    def get(self):
+        now = datetime.datetime.now()
+
+        db = self.get_db()
+        cursor = db.cursor()
+        start = datetime.datetime(now.year, now.month, now.day)
+        stop = start + datetime.timedelta(days=1)
+        cursor.execute("select * from torder "
+                       "where time > ? and time < ? order by time",
+                       (start, stop))
+        orders = cursor.fetchall()
+        names = Set()
+        finalOrders = []
+        orders.reverse()
+        for order in orders:
+            if order[2] not in names:
+                finalOrders.insert(0, order)
+                names.add(order[2])
+        self.render("showorder.html", orders=finalOrders)
 
 class PasswordHandler(BaseHandler):
     @tornado.web.authenticated
