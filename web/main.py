@@ -39,7 +39,9 @@ class Application(tornado.web.Application):
             (r"/test", Test),
             (r"/auth/login", AuthHandler),
             (r"/auth/password", PasswordHandler),
+            (r"/auth/adduser", AddUserHandler),
             (r"/log/(?P<year>\d+)/(?P<month>\d+)/(?P<day>\d+)", LogHandler),
+            (r"/order", OrderHandler),
             (r"/supper", Cancel),
             ]
         settings = dict(
@@ -67,6 +69,27 @@ class BaseHandler(tornado.web.RequestHandler):
         db = sqlite3.connect(os.path.join(DOCUMENT_ROOT, 'database.db'))
         return db
 
+class AddUserHandler(BaseHandler):
+    def get(self):
+        self.render("adduser.html")
+    def post(self):
+        username = self.get_argument("username")
+        password = self.get_argument("password")
+
+        self.write("username=%s password=%s"%(username,password))
+
+class OrderHandler(BaseHandler):
+    def get(self):
+        self.render("order.html")
+    def post(self):
+        name = self.get_argument("username")
+        order = self.get_argument("order")
+        order2 = self.get_argument("order2")
+        
+        self.write("username=%s order=%s order2=%s"%(name, order, order2))
+        db = self.get_db()
+        cursor = db.cursor()
+        
 
 class PasswordHandler(BaseHandler):
     @tornado.web.authenticated
@@ -299,3 +322,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# create table torder (id integer primary key asc autoincrement, time datetime, username text, ordername1 text, ordername2 text)
+# insert into torder (id,time,username,ordername1,ordername2) values (null, null,"lanqing","cai1","cai2");
