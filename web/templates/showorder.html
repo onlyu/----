@@ -1,13 +1,15 @@
 {% extends "base.html" %}
 {% block main %}
 <h1>已点餐</h1>
+<a href="/order">我要点餐</a>
+<br/>
 <table border=1>
   <thead>
     <tr><td>姓名：</td><td>时间：</td> <td>午餐:</td> <td>晚餐: </td></tr>
     </thead>
   {% for order in orders %}
   <tr>
-    <td>{{ order[2] }}</td><td>{{ order[1] }}</td><td>{{order[3]}}</td><td>{{order[4]}}</td>
+    <td>{{ order[2] }}</td><td>{{ order[1][11:16] }}</td><td>{{order[3]}}</td><td>{{order[4]}}</td>
     </tr>
   {% end %}
   </table>

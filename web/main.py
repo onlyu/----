@@ -33,7 +33,8 @@ DOCUMENT_ROOT = os.path.dirname(__file__)
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
-            (r"/", MainHandler),
+#            (r"/", MainHandler),
+            (r"/", ShowOrderHandler),
             (r"/statics", Statics),
             (r"/success", Success),
             (r"/cancel", Cancel),
